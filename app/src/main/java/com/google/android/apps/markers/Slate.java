@@ -17,6 +17,7 @@
 package com.google.android.apps.markers;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.res.Resources;
@@ -24,6 +25,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Insets;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -39,8 +41,12 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowInsets;
 
 import org.dsandler.apps.markers.R;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class Slate extends View {
 
@@ -117,6 +123,8 @@ public class Slate extends View {
     private float mPanX = 0f, mPanY = 0f;
     private int mMemClass;
     private boolean mLowMem;
+
+    private final ArrayList<Rect> mGestureExclusionRects = new ArrayList<>();
 
     public interface SlateListener {
         void strokeStarted();
@@ -844,6 +852,50 @@ public class Slate extends View {
             if (0 != (mDebugFlags & FLAG_DEBUG_PRESSURE)) {
                 mPressureCooker.drawDebug(canvas);
             }
+        }
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+
+        if (changed && Build.VERSION.SDK_INT >= 29) {
+            updateGestureExclusionRects();
+        }
+    }
+
+    @Override
+    public void onWindowSystemUiVisibilityChanged(int visible) {
+        super.onWindowSystemUiVisibilityChanged(visible);
+
+        if (Build.VERSION.SDK_INT >= 29) {
+            updateGestureExclusionRects();
+        }
+    }
+
+    @TargetApi(29)
+    private void updateGestureExclusionRects() {
+        if ((getWindowSystemUiVisibility() & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) != 0) {
+            // If the navigation bar is hidden, lets exclude any vertical edges so that
+            // the user can draw freely
+
+            final WindowInsets rootWindowInsets = getRootWindowInsets();
+            if (rootWindowInsets == null) {
+                // Root window insets are null, which happens if this is called before we're
+                // attached and laid out. Ignore the call for now.
+                return;
+            }
+
+            final Insets gestureInsets = rootWindowInsets.getSystemGestureInsets();
+
+            mGestureExclusionRects.clear();
+            mGestureExclusionRects.add(new Rect(0, 0, gestureInsets.left, getHeight()));
+            mGestureExclusionRects.add(new Rect(getWidth() - gestureInsets.right, 0,
+                    getWidth(), getHeight()));
+            setSystemGestureExclusionRects(mGestureExclusionRects);
+        } else {
+            // If the navigation bar is showing, we don't want to exclude any edges.
+            setSystemGestureExclusionRects(Collections.<Rect>emptyList());
         }
     }
 
