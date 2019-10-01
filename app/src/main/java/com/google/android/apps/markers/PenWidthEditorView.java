@@ -17,7 +17,9 @@
 package com.google.android.apps.markers;
 
 import android.content.Context;
-import android.graphics.*;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -72,7 +74,7 @@ public class PenWidthEditorView extends View {
         final boolean vertical = getHeight() > getWidth();
         final float center = (vertical ? getWidth() : getHeight()) / 2;
         final float quarter = (vertical ? getPaddingTop() : getPaddingLeft())
-                + WIDTH_MAX*0.5f;
+                + WIDTH_MAX * 0.5f;
         return new PointF(vertical ? center : quarter, vertical ? quarter : center);
     }
 
@@ -80,7 +82,7 @@ public class PenWidthEditorView extends View {
         final boolean vertical = getHeight() > getWidth();
         final float center = (vertical ? getWidth() : getHeight()) / 2;
         final float quarter = (vertical ? getHeight() - getPaddingBottom() : getWidth() - getPaddingRight())
-                - WIDTH_MAX*0.5f;
+                - WIDTH_MAX * 0.5f;
         return new PointF(vertical ? center : quarter, vertical ? quarter : center);
     }
 
@@ -96,18 +98,18 @@ public class PenWidthEditorView extends View {
         final PointF endP = getEndPoint();
 
         final float center = (vertical ? getWidth() : getHeight()) / 2;
-        final float amplitude = (center-r2)*0.5f;
+        final float amplitude = (center - r2) * 0.5f;
 
-        r1 = Slate.clamp(0.5f*WIDTH_MIN, 0.5f*WIDTH_MAX, r1);
-        r2 = Slate.clamp(0.5f*WIDTH_MIN, 0.5f*WIDTH_MAX, r2);
+        r1 = Slate.clamp(0.5f * WIDTH_MIN, 0.5f * WIDTH_MAX, r1);
+        r2 = Slate.clamp(0.5f * WIDTH_MIN, 0.5f * WIDTH_MAX, r2);
 
-        final float iter = Math.min(8f,r1) / (vertical ? getHeight() : getWidth());
+        final float iter = Math.min(8f, r1) / (vertical ? getHeight() : getWidth());
 
         for (float f = 0f; f < 1.0f; f += iter) {
             final float y = Slate.lerp(vertical ? startP.y : startP.x,
-                                       vertical ? endP.y   : endP.x,
-                                       f);
-            final float x = (float) (center + amplitude*Math.sin(f * 2*Math.PI));
+                    vertical ? endP.y : endP.x,
+                    f);
+            final float x = (float) (center + amplitude * Math.sin(f * 2 * Math.PI));
             final float r = Slate.lerp(r1, r2, f);
             canvas.drawCircle(vertical ? x : y, vertical ? y : x, r, mPaint);
         }
@@ -115,13 +117,13 @@ public class PenWidthEditorView extends View {
 
         if (mTouchingMin) {
             canvas.drawCircle(startP.x, startP.y, r1, mPaintTouching);
-            final float xoff = vertical?0:r1;
-            final float yoff = vertical?r1:0;
+            final float xoff = vertical ? 0 : r1;
+            final float yoff = vertical ? r1 : 0;
             canvas.drawCircle(startP.x, startP.y, r1, mPaintTouching);
             //canvas.drawLine(startP.x, startP.y, startP.x - xoff, startP.y - yoff, mPaintTouching);
         } else if (mTouchingMax) {
-            final float xoff = vertical?0:r2;
-            final float yoff = vertical?r2:0;
+            final float xoff = vertical ? 0 : r2;
+            final float yoff = vertical ? r2 : 0;
             canvas.drawCircle(endP.x, endP.y, r2, mPaintTouching);
             //canvas.drawLine(endP.x, endP.y, endP.x + xoff, endP.y + yoff, mPaintTouching);
         }
@@ -131,27 +133,27 @@ public class PenWidthEditorView extends View {
         final String maxStr = String.format((strokeWidthMax < 3) ? "%.1f" : "%.0f",
                 strokeWidthMax);
         float textoff1, textoff2;
-        if (r1 < 2*mTextSize) {
-            textoff1 = r1+mTextSize*1.25f;
+        if (r1 < 2 * mTextSize) {
+            textoff1 = r1 + mTextSize * 1.25f;
             mLabelPaint.setColor(0xFF000000);
         } else {
             textoff1 = 0;
             mLabelPaint.setColor(0xFFFFFFFF);
         }
         canvas.drawText(minStr,
-                startP.x - (vertical?0:textoff1),
-                startP.y - (vertical?textoff1:0) + mTextSize*.3f,
+                startP.x - (vertical ? 0 : textoff1),
+                startP.y - (vertical ? textoff1 : 0) + mTextSize * .3f,
                 mLabelPaint);
-        if (r2 < 2*mTextSize) {
-            textoff2 = r2+mTextSize*1.25f;
+        if (r2 < 2 * mTextSize) {
+            textoff2 = r2 + mTextSize * 1.25f;
             mLabelPaint.setColor(0xFF000000);
         } else {
             textoff2 = 0;
             mLabelPaint.setColor(0xFFFFFFFF);
         }
         canvas.drawText(maxStr,
-                endP.x + (vertical?0:textoff2),
-                endP.y + (vertical?textoff2:0) + mTextSize*.3f,
+                endP.x + (vertical ? 0 : textoff2),
+                endP.y + (vertical ? textoff2 : 0) + mTextSize * .3f,
                 mLabelPaint);
     }
 
@@ -185,9 +187,9 @@ public class PenWidthEditorView extends View {
                 }
 
                 dist = mTouchingMin ? d1 : d2;
-                dist = Slate.clamp(0.5f*WIDTH_MIN, 0.5f*WIDTH_MAX, dist - mTouchFudge);
+                dist = Slate.clamp(0.5f * WIDTH_MIN, 0.5f * WIDTH_MAX, dist - mTouchFudge);
                 // make it easier to target finer weights more exactly
-                dist = (float) Math.pow(dist/(0.5f*WIDTH_MAX),3)*0.5f*WIDTH_MAX;
+                dist = (float) Math.pow(dist / (0.5f * WIDTH_MAX), 3) * 0.5f * WIDTH_MAX;
 
                 if (mTouchingMin || mTouchingMax) {
                     if (mTouchingMin) {

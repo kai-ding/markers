@@ -19,7 +19,6 @@ package com.google.android.apps.markers;
 import android.graphics.Rect;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 
@@ -40,7 +39,7 @@ public class DecorTracker {
     public void setInsets(Rect insets) {
         mCurrentInsets.set(insets);
         final int N = mInsettables.size();
-        for (int i=0; i<N; i++) {
+        for (int i = 0; i < N; i++) {
             final View v = mInsettables.get(i);
             final ViewGroup.LayoutParams vglp = v.getLayoutParams();
             if (!(vglp instanceof ViewGroup.MarginLayoutParams)) continue;

@@ -16,14 +16,13 @@
 
 package com.google.android.apps.markers;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-
 import android.view.MotionEvent;
+
+import java.util.LinkedList;
 
 public class SpotFilter {
     public static boolean DEBUG = true;
-    
+
     public static boolean PRECISE_STYLUS_INPUT = true;
 
     public static interface Plotter {
@@ -47,7 +46,7 @@ public class SpotFilter {
 
     public Spot filteredOutput(Spot out) {
         if (out == null) out = new Spot();
-        
+
         float wi = 1, w = 0;
         float wi_press = 1, w_press = 0;
         float x = 0, y = 0, pressure = 0, size = 0;
@@ -56,7 +55,7 @@ public class SpotFilter {
             x += pi.x * wi;
             y += pi.y * wi;
             time += pi.time * wi;
-            
+
             pressure += pi.pressure * wi_press;
             size += pi.size * wi_press;
 
@@ -82,13 +81,13 @@ public class SpotFilter {
     }
 
     public void add(MotionEvent.PointerCoords c, long time) {
-    	addNoCopy(new Spot(c, time));
+        addNoCopy(new Spot(c, time));
     }
-    
+
     public void add(Spot c) {
-    	addNoCopy(new Spot(c));
+        addNoCopy(new Spot(c));
     }
-    
+
     protected void addNoCopy(Spot c) {
         if (mSpots.size() == mBufSize) {
             mSpots.removeLast();

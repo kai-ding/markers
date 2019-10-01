@@ -16,13 +16,6 @@
 
 package com.google.android.apps.markers;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.CharBuffer;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -30,7 +23,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.AssetFileDescriptor;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +30,10 @@ import android.webkit.WebView;
 import android.widget.TextView;
 
 import org.dsandler.apps.markers.R;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 class About {
     static char buf[] = new char[1024];
@@ -48,7 +44,7 @@ class About {
             final BufferedReader reader = new BufferedReader(
                     new InputStreamReader(context.getAssets().open(filename)));
             String line;
-            while ( (line = reader.readLine()) != null ) {
+            while ((line = reader.readLine()) != null) {
                 fileData.append(line);
             }
             return fileData.toString();
@@ -70,7 +66,7 @@ class About {
         return version;
     }
 
-	static void show(final MarkersActivity activity) {
+    static void show(final MarkersActivity activity) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle(null);
         builder.setCancelable(true);
@@ -84,7 +80,7 @@ class About {
         title.setText(activity.getString(R.string.app_name) + " " + getVersionString(activity));
 
         WebView webview = (WebView) layout.findViewById(R.id.html);
-        webview.loadDataWithBaseURL("file:///android_asset/", 
+        webview.loadDataWithBaseURL("file:///android_asset/",
                 loadFileText(activity, "about.html"), "text/html", "utf-8", null);
 
         builder.setView(layout);
@@ -93,24 +89,27 @@ class About {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
                 activity.clickSiteLink(null);
-            }});
+            }
+        });
         builder.setNeutralButton("on Play Store", new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
                 activity.clickMarketLink(null);
-            }});
+            }
+        });
         builder.setPositiveButton("QR code", new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
                 QrCode.show(activity);
-            }});
+            }
+        });
 //        builder.setNegativeButton("Neat!", new OnClickListener() {
 //            @Override
 //            public void onClick(DialogInterface dialog, int which) {
 //                dialog.dismiss();
 //            }});
-		builder.create().show();
-	}
+        builder.create().show();
+    }
 }
